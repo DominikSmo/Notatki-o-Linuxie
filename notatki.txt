@@ -1,0 +1,220 @@
+Linux
+System Linux jest systemem operacyjnym opartym na jądrze(kernel). System operacyjny to program nadrzędny, który zarządza sprzętem i umożliwia uruchamianie
+innych programów. Z punktu widzenia ekosystemu system operacyjny można rozumieć jako ekosystem informatyczny czyli złożony zbiór ściśle 
+współpracujących ze sobąelementów(komponentów), które komunikują się, współdziałają i utrzymują stabilne środowisko dla uruchamiania programów 
+i zarządzania zasobami komputera.
+Jądro(kernel) to program centralny systemu, który zarządza wszytskim pomiędzy sprzętem a oprogramowaniem użytkownika. Innymi słowy jądro(kernel) to część
+systemu operacyjnego, która zarządza zasobami sprzętowymi komputera i udostępnia je innym programom, np. terminalowi, edytorom tekstu, przeglądarce,itd.
+Jądro(kernel) zarządza procesami, zarządza pamięcią RAM(przydziela bądź zwalnia pamięć programom), zajmuje się obsługą urządzeń(za pomocą sterowników). O 
+ile jądro nie posiada plików w samym sobie o tyle dzięki jądru(kernelowi) ma się dostęp do plików. Z kolei pliki i katalogi znajdują się dysku. 
+Jądro(kernel) działa wtle. Ale bez niego żaden program by nie działał. Niektórzy twierdzą, że Linux nie jest systemem operacyjnym. Systemem operacyjnym 
+jest dana dystrybucja czyli wersja Linuxa. Np. Fedora to system opercyjny. Natomiast Linux to jądro(kernel) czyli centralny program systemu operacyjnego. 
+Zatem przykładowo Fedora jest systemem operacyjnym a Linux jest jądrem(kernelem) tego systemu.
+A co to jest GRUB? GRUB czyli Grand Unified Bootloader-dosłownie "Wielki zunifikowany program ładujący" to pierwszy fragment systemu operacyjnego. GRUB ładuje
+jądro(kernel) systemu. Następnie jądro(kernel) ładuje resztę systemu. Dodatkowo GRUB może działać jako interpreter komend. Można użyć GRUB jako terminala 
+i wpisywać w nim polecenia. Można powiedzieć, że GRUB to mini powłoka. Ale działa przed uruchomieniem systemu. Komendy GRUB i jego język są stworzone 
+w taki sposób aby GRUB uruchamiał jądro(kernel) systemu operacyjnego. Innymi słowy GRUB ma własne, ograniczone środowisko poleceń. GRUB umożliwia 
+dzięki swoim poleceniom ręczneuruchomienie jądra. Korzystając z poleceń GRUB mogę wybrać, które jądro załadować. 
+Np.jeśli najnowsze jądro jest zepsute to mogę wówczas uruchomić z pozycji terminala w GRUB uruchomić starsze jądro, które np. działa poprawnie.
+Podstawowe polecenia w terminalu GRUB:
+ls (hd0,gpt2) wyświetla partycję gpt2(co się na niej znajduje). Jeśli partycja jest pusta GRUB zgłasza błąd.
+Ręczne uruchomienie jądra(kernela):
+U mnie:
+set root=(hd0,gpt2)
+linux /vmlinuz-6.15.7-200.fc42.x86_64 root=UUID=...... root=subvol=/root
+vmlinuz to wersja jądra Linuxa, który chcę uruchomić. UUID(Universally Unique Identifier) to unikalny identyfikator przypisany do systemu plików (np. do
+partycji). U mnie w Fedorze jądro oraz obraz plików tymczasowych initramfs-6.15.200-fc42.x86_64.img odpowiadający wersji jądra vmlinuz są umieszczone
+na partycji /de/sda2. Natomiast filesystem root(czyli system wszystkich plików Linuxa, to wszystkie pliki systemu operacyjnego) umieszczony jest na partycji
+ /dev/sda3. Numer UUID, który jest podany przy ręcznym wybieraniu jądra Linuxa przypisany jest właśnie do tej konkretnej wersji jądra Linuxa. Ale ponieważ
+główny system plików root jest zamontowany na innej partycji niż wszystkie wersje jądra to przy wyborze konkretnej wersji jądra do załadowania ręcznie w GRUB
+należy wpisać konkretną wersję jądra, które chcemy ręcznie załadować wraz numerem montowania przypisanym do systemu plików root, a system plików root
+jest zamontowany na partycji /dev/sda3.Inaczej:
+na partycji gpt2 znajduje się katalog /boot a w nim różne wersje jądra, pliki tymczasowe initramfs, pliki config oraz System.map w odpowiednich wersjach.
+Natomiast główny system plików root znajduje się na partycji gpt3. Zatem aby załadować jądro w odpowiednieh wersji GRUB musi odnieść się do lokalizacji jądra
+a następnie ładowane jądro musi być powiadomione skąd ma uruchomić pliki systemu operacyjnego. A te znajdują się na partycji gpt3.
+Oto polecenia, które należy wpisać w terminalu GRUB aby ręcznie załadować jądro(kernel) systemu(aby wejść do terminalu GRUB tuż przy uruchamianiu dystrybucji
+Linux należy wcisnąć Esc a następnie gdy pojawi się lista przeznaczonych do uruchomienia wersji dystrybucji Linux należy wcisnąć c):
+set root=(hd0,gpt2)  informuję GRUB,skąd może odczytać pliki jądra i pliku initramfs(wszystkie jak już wiadomo znajdują się na partycji gpt2)
+linux /vmlinuz.... root=UUID=.... subvol=.... tutaj najpierw przesyłam jest informacja do GRUB, którą wersję jądra ma uruchomić. Następnie część root=UUID
+=... informuje jądro gdzie dokładnie znajduje się główny system plików root o konkretnym identyfikatorze UUID.
+Później:
+initrd /initramfs....img jest to informacja dla GRUB, którą wersję pliku initramfs ma uruchomić.
+Initramfs(Initial RAM File System) to tymczasowy system plików, który istnieje tylko w pamięci RAM. Jest on ładowany do pamięci podczas rozruchu systemu 
+Linux. Jest używany do wykonania niezbędnych operacji przed zamontowaniem głównego systemu plików(root). Ma pomóc w procesie uruchamiania jądra Linuxa.
+Po trzech powyższych poleceniach w terminalu GRUB należy wpisać boot i wówczas, jeśli wszystko zostało poprawnie zapisane w poleceniach to zacznie ładować
+się jądro Linux czyli plik vmlinuz a następnie głównys system plików root.
+Należy jeszcze dodać, że kluczowym do poprawnego ręcznego uruchomienia systemu z poziomu GRUB może być wpisanie dokładnej lokalizacji subwolumenu.
+Wolumen to logiczna przestrzeń dyskowa, którą system operacyjny traktuje jako partycję na dysku lub cały dysk. Wolumen jest miejscem przechowywania danych.
+Z kolei subwolumen odnosi się do systemu plików Btrfs(B-tree-File System). Btrfs to system plików stworzony dla systemu Linux. Jest domyślnym systemem
+plików dla Fedory. Jeżeli zatem w systemie Linux istnieje system plików Btrfs to oznacza to, że wolumen to po prostu system Btrfs zainstalowany na jakiejś
+partycji. Natomiast subwolumen to część partycji na której utworzony jest system plików Btrfs. Subwolumeny przypominają katalogi ale w rzeczywistości nimi
+nie są. Zatem wolumen jest przestrzenią dyskową jak partycja, natomiast subwolumen istnieje wewnątrz tej partycji jako część systemu plików Btrfs.
+Należy dodać, że system plików Btrfs to system plików z funkcjami snapshotów,subwolumenów itd. Snapshoty to takie kopie zapasowe(backupy) części systemu
+operacyjnego(np. konkretnych części dysków). Dla porównania narzędzie do tworzenia elastycznych, logicznych partycji dyskowych LVM (Logical Volume Manager)
+to nie system plików a narzędzie, które daje możliwość tworzenia wolumenów. Działa poza systemem Btrfs. Zatem może działać bez systemu Btrfs ale nie ma 
+możliwości wówczas stworzenia żadnego subwolumenu. Ta możliwość jest dostępna w systemie Btrfs.
+Zatem co konkretnie umożliwia LVM?
+-tworzenie wolumenów logicznych(LV)-zamiast dzielić dysk na sztywne partycje, można tworzyć elastyczne partycje(LV), które można powięszkać lub zmniejszać,
+usuwać lub tworzyć kopie(snapshoty), przenosić między dyskami.
+-łączenie wielu fizycznych dysków w jeden duży obszar(VG). Wówczas nie trzeba martwić się zapełnieniem jakiegoś dysku.
+-snapshoty-utworzenie punktu w czasie, do którego zawsze można wrócić.Bardzo przydatne do backupów(kopii zapasowych systemu).
+-RAID-like funkcje(striping,mirroring)-na poziomie LVM. Zatem VG czyli Volume Group to wspólna pula przestrzeni dyskowej z których można stworzyć za pomocą
+LVM LV czyli Logical Volumes-elastyczne partycje. Można je wówczas zwiększać, zmniejszać, przenosić i robić snapshoty.
+LVM działa na jednym dysku jak i na wielu dyskach.
+
+Polecenia
+
+Polecenie w systemie LInux jest programem, który wykonuje określone zadanie. Polecenia wpisuje się terminalu powłoki. Powłoka także jest programem. Służy
+ona do kumunikacji pomiędzy użytkownikiem a systemema jej narzędziem stworzonym do tego celu jest terminal czyli interfejs tekstowy.
+Np. polecenie pwd wyświetla bieżący katalog. Czyli katalog w którym się teraz znajdujemy. Domyślnie bieżącym katalogiem jest katalog domowy użytkownika,np. 
+/home/dominiksmolik
+Katalog domowy można również zapisać jako ~ czyli znak tyldy. Wiele poleceń można wykonać przez wpisanie ich nazw ale znacznie częściej wpisuje się jeszcze
+znaki dodatkowe, których zadaniem jest zmodyfikowanie sposobu działania polecenia. Te znaki i słowa wpisywane po poleceniu nazywane są opcjami i argumentami.
+Większość poleceń ma jedną lub więcej opcji. Opcje mają zwykle postać jednej litery poprzedzonej znakiem minus. Do danego polecenia można dodawać kilka opcji
+wg kolejności wyświetlania jakie chcemy uzyskać. Wówczas każdą opcję poprzedzamy znakiem minus albo możemy wypisać wszystkie opcje jedna po drugiej i taki
+ciąg opcji poprzedzić jednym znakiem minus. Oba sposoby dadzą ten sam wynik.
+Np. będąc w katalogu domowym możemy użyć polecenia ls, które wyświetli wszystkie pliki i foldery znajdujące się w naszym katalogu domowym(oprócz plików
+ukrytych). Jeśli użyjemy tego polecenia z opcją -l to wówczas zostaną wyświetlone szczegółowe dane wyjściowe. Czyli wpiszemy ls -l.
+Jeżeli chcemy aby jednocześnie polecenie wyświetliło pliki i katalogi ukryte z katalogu domowego to możemy użyć polecenia ls dodatkowo z opcją -a. Wówczas
+mamy ls -l -a. Jeżeli chcemy aby jednocześnie elementy katalogu domowego były wyświetlane wg godziny to użyjemy opcji -t. Mamy zatem ls -l -a -t.
+Ale polecenie ls z opcjami -l -a -t zadziała tak samo jak polecenie ls -lat.
+Część poleceń zawiera opcje, które można wypisać w postaci całych słów. Są to opcje pełnosłowne. Taką opcję należy wówczas poprzedzić dwoma znakami minus.
+Taką opcją dla większości poleceń jest opcja --help. Jeżeli chcemy sprawdzić z jaki opcjami działa dane polecenie wraz z opisami tych działań to wystarczy
+wpisać dane polecenie i dodać do niego opcję --help.
+Wiele poleceń akceptuje także argumenty podane po określonych opcjach bądź umieszczone na końcu wiersza polecenia w terminalu. Argument to dodatkowy fragment
+informacji, np. nazwa pliku lub katalogu, nazwa użytkownika, nazwa urządzenia albo jeszcze inny element względem którego ma zostać wykonane polecenie.
+Np. jeżeli chcemy sprawdzić zawartość katalogu /boot, który jest podkatalogiem katalogu głównego systemu Linux(oznaczanego jako /) to wówczas możemy użyć
+polecenia ls jak powyżej i wpisyjemy w terminalu ls -lat /boot. Gdzie ls jest poleceniem, lat to ciąg trzech opcji: l, a i t, natomiast /boot jest tutaj
+argumentem. Zwykle do polecenia można dodać dowolną liczbę argumentów. Ograniczeniem może być tylko limit znaków w jednym wierszu polecenia.
+Aby znaleźć polecenie znaleźć polecenie wydane przez użytkownika powłoka sprawdza katalogi wymienione w tzw. ścieżce dostępu(path). Każde polecenie jest
+plikiem wykonywalnym. Jeżeli znany jest katalog w którym znajduje się dane polecenie to możemy go użyć wpisując pełną ścieżkę dostępu czyli np. /bin/date.
+Polecenie date znajduje się w katalogu /bin katalogu głównego Linuxa. Ale co jeśli ścieżka dostępu do danego polecenia jest dość długa? Wówczas warto
+posiadać polecenia w miejscu, które jest jakby domyślnie znane systemowi. Takim miejscem może być zmienna środowiskwa PATH. Można powiedzieć, że zmienna
+środowiskowa PATH jest ścieżką dostępu do znalezienia przez powłokę danego polecenia. Zmienna środowiskowa PATH posiada wartość. Jej wartością jest lista 
+katalogów. Aby ją zobaczyć wystarczy wydać polecenie echo a po nim wpisać $PATH czyli echo $PATH. Wówczas zostanie wyświetlona lista katalogów
+oddzielonych dwukropkami. Np. częściowo będzie to lista katalogów: /home/dominiksmolik/.local/bin:/home/dominiksmolik/bin:.....
+W tym wypadku katalog /bin wypisany po nazwie katalogu domowego znajduje się w katalogu domowym uzytkownika ale nie jest to ten sam katalog /bin
+ który znajduje się w katalogu głównym. Inaczej:
+pełna wartość zmiennej środowiskowej w mojej Fedorze to 
+/home/dominiksmolik/.local/bin:/home/dominiksmolik/bin:/usr/local/bin:/usr/bin:/usr/local/sbin
+
+katalog /home/dominik/smolik/.local/bin-to prywatny katalog przeznaczony dla programów zainstalowanych przez użytkownika
+katalog /home/dominiksmolik/bin-w tym katalogu(/bin) użytkownik może tworzyć swoje własne programy(np. polecenia) i skrypty
+katalog /usr/local/bin-przeznaczony dla lokalnie zainstalowanych programów dostępnych dla wszystkich użytkowników
+katalog /usr/bin-przeznaczony dla standardowych programów systemowych, np. w tym katalogu znajdują się główne polecenia systemu Linux
+katalog /usr/local/sbin-przeznaczony dla lokalnych programów administracyjnych
+Po prostu katalog /usr/bin to ten sam katalog co /bin. Czyli jest to podkatalog katalogu głównego. Zatem /usr/bin czyli /bin to podkatalog katalogu /.
+W nim znajduje się wiele poleceń systemowych typu ls, bash, pwd, itd. 
+Np. polecenie pwd czyli to, które pokazuje w jakim obecnie katalogu się znajdujemy znajduje się w katalogu /bin ale nie w katalogu /home/dominiksmolik/bin
+tylko w katalogu //bin. Inaczej można to zapisać jako /katalog główny/bin.
+Nie wszystkie systemowe polecenia Linuxa znajdują się w katalogach pojawiających się w zmiennej PATH. Część poleceń jest wbudowanya w powłokę czyli są to
+polecenia wewnętrzne powłoki systemu Linux. Ściślej: może być tak, że polecenie type -a czyli takie, które pokazuje wszystkie lokalizacje danego polecenia
+w systemie pokaże, że, dane polecenie jest wbudowane w powłokę i znajduje się w katalogu /usr/bin. Takie polecenie występuje w dwóch wersjach. To wbudowane 
+w powłokę czyli builtin jest wyszukiwane przez powłokę jako pierwsze. Czyli jeśli np. wpiszemy w powłoce polecenie cd, które zmienia naszą lokalizację
+w systemie to wykonywane jest polecenie z wnętrza powłoki. Jeżeli natomiast użyjemy polecenia /usr/bin/cd to będzie to polecenie zewnętrzne czyli to, które 
+znajduje się w katalogach wymienionych w zmiennej PATH. Ono może działać inaczej niż polecenie wbudowane w powłokę. Polecenie cd to polecenie wbudowane 
+w powłokę. Natomiast polecenie /usr/bin/cd to polecenie, które jest wskazywane przez wartości umieszczone w zmiennej PATH. Jest to tzw. polecenie zewnętrzne.
+Polecenie cd jest poleceniem wewnętrznym. I to polecenie jest wykonywane przez powłokę. Gdy natomiast wpiszemy /usr/bin/cd to to polecenie jest wyszukiwane
+nie z powłoki a z katalogów wskazanych w zmiennej PATH.
+Gdy wpiszemy w terminalu cd /etc to zostaniemy przeniesieni do katalogu /etc. Natomiast gdy wpiszemy /usr/bin/cd /etc to zostaniemy w katalogu głównym.
+To polecenie nie zmieni lokalizacji. Jest to polecenie, które jest nieefektywne. Zostało do celów edukacyjnych bądź diagnostycznych.
+Ale istnieją takie polecenia, które są wyłącznie poleceniami zewnętrznymi czyli są zainstalowane w systemie jako pliki wykonywalne. One właśnie znajdują 
+się w katalogu /bin, który jest podkatalogiem głównego katalogu. Takim poleceniem jest np. polecenie cp(copy). Ono znajduje się wyłącznie w katalogu
+/usr/bin. Takim poleceniem jest także nano, które służy do edytowania plików tekstowych. Zatem jedyne lokalizacje w systemie poleceń cp i nano to kolejno:
+/usr/bin/cp oraz /usr/bin/nano
+Dlaczego istnieją polecenia zewnętrzne i wbudowane? Bo polecenia wbudowane działają często szybciej. Działają od razu z poziomu powłoki. Ale bez poleceń
+zewnętrznych system nie działałby efektywnie. Polecenia zewnętrzne to samodzielne programy. Są pełnoprawnymi narzędziami systemowymi. Polecenia wbudowane
+mają ograniczone działanie dlatego muszą istnieć polecenia zewnętrzne. Polecenia wbudowane sterują samą powłoką. Nie istnieje takie polecenie wbudowane,
+za pomocą którego możnaby edytować treść pliku tekstowego. To może zrobić jedynie polecenie zewnętrzne. Polecenia wbudowane w powłokę mogą jedynie
+nadpisywać plik ale nie działają w sensie otwartego interfejsu tekstowego. Tzn. nie otwierają pliku tekstowego. Plik tekstowy może otworzyć jedynie
+polecenie zewnętrzne,np. polecenie nano. Polecenia wbudowane zostały tak zaprojektowane aby zarządzać stanem powłoki, zmiennymi środowiskowymi,
+nawigacją po katalogach, obsługą wejścia/wyjścia, przepływem sterowania. Nie są one stworzone do interakcji z plikami w sensie np. zmiany ich zawartości.
+Polecenia wbudowane nie służa do edycji ani do interaktywnego otwierania plików. Edycja plików wymaga użycia zewnętrznych poleceń czyli plików
+wykonywalnych, znajdujących się w katalogu /usr/bin. Polecenia wbudowane mogą pracować na danych, np. echo ale nie otwierają plików tekstowych same
+w sobie. Używając polecenia echo można dopisać jakieś zdanie do pliku tekstowego,np.: echo "Tekst" >> /mnt/shared/notatki.txt ale polecenie to nie otworzy
+pliku notatki.txt. Plik notatki.txt może zostać otwarty przez użycie np. polecenia nano, które jest wyłącznie poleceniem zewnętrznym systemu Linux. Zatem 
+stwierdzenie, że czasem ścieżka do uruchomienia polecenia może być zbyt długa i lepiej skorzystać ze zmiennej środowiskowej PATH dotyczy tylko i wyłącznie
+użycia poleceń zewnętrznych. Po prostu aby łatwiej było użyć tych poleceń umieszczono je w wartościach zmiennej środowiskowej PATH. Powłoka nie znajdzie
+polecenia zewnętrznego w niej samej. Używa do tego katalogów wylistowanych w zmiennej PATH. Zmienna środowiskowa PATH to tak naprawdę lista katalogów,
+które powłoka przeszukuje aby znaleźć zewnętrzne polecenie, którego nie zna jako wbudowanego.
+Poleceń można też używać w postaci aliasów. Alias to skrót danego polecenia.
+Należy też dodać, że powłoka wyszukuje poleceń wydawanych przez użytkownika w określonej kolejności.
+Jako pierwsze wyszukuje polecenia w postaci aliasów. 
+Następnie jeśli dane polecenie nie występuje w postaci aliasu to powłoka wyszukuje użytego polecenia wśród zastrzeżonych słów powłoki.
+Jeśli wydane polecenie nie jest słowem zastrzeżonym powłoki to wyszukuje ona polecenia wśród funkcji.
+Jeżeli szukane polecenie nie jest funkcją to powłoka wyszukuje go z pośród wbudowanych w nią poleceń. 
+Jeśli szukane polecenie nie jest poleceniem wewnętrznym powłoki to wówczas zostaje ostateczna opcja jaką jest zmienna środowiskowa PATH. Zatem jeżeli
+wyczerpane zostaną powyższe cztery możliwości to wówczas wiadomo, że użyte przez użytkownika polecenie jest poleceniem zewnętrznym. Polecenie zewnętrzne
+jest przechowywane i uruchamiane z systemu plików komputera(jest to polecenie, które jest wskazywane przez wartości umieszczone w zmiennej PATH).
+Warto dodać, że polecenia można ze sobą łączyć lub rozszerzać ich działanie. Można to osiągnąć używając tzw. metaznaków. Do metaznaków zaliczamy
+- znak potoku |
+-ampersand &
+-średnik ;
+-prawy nawias okrągły )
+-lewy nawias okrągły (
+-znak mniejszości <
+-znak większości >
+
+
+Pobieranie informacji o poleceniach.
+
+Jeżeli chcemy znaleźć lokalizację danego polecenia w systemie to wystarczy użyć polecenia type. Polecenie to pokazuje lokalizację danego polecenia w takiej
+kolejności w jakiej powłoka wyszukuje danego polecenia wydanego przez użytkownika. Tak więc jeżeli szukamy lokalizacji polecenia wbudowanego 
+i polecenie to znajduje się także w wartości zmiennej PATH to wówczas polecenie type pokaże nam informację: "to jest polecenie wbudowane". 
+Jeżeli natomiast użyjemy polecenia type z opcją -a to wówczas polecenie type -a wyświetli wszystkie lokalizacje danego polecenia w systemie. 
+Jeżeli naomiast chcemy pobrać informacje o danym poleceniu to gdy tym poleceniem jest polecenie zewnętrzne to wówczas piszemy nazwę tego polecenia
+a następnie używamy opcji pełnosłownej help poprzedzonej dwoma minusami, np. bash --help.
+Jeżeli natomiast chcemy pobrać informację o poleceniu wbudowanym to wówczas użyjemy help nie jako opcji ale jako polecenia. Wówczas piszemy:
+help nazwa danego polecenia wewnętrznego, np. help cd. Jeżeli chcemy wyświetlić listę wszystkich poleceń wbudowanych w powłokę to wówczas należy użyć
+polecenia help.
+Zdarza się, że dane polecenie jest jednocześnie poleceniem zewnętrznym i wbudowanym. Wówczas czasem zadziała komenda polecenie --help a czasem nie. 
+Natomiast zawsze zadziała wtedy help polecenie. Generalnie opcja --help nie jest zarezerwowana dla poleceń zewnętrznych. Polecenia, które są wyłącznie
+wbudowane w powłokę też mogą zadziałać z opcją --help. Np. polecenie declare jest poleceniem wyłącznie wewnętrznym a mimo to działa z opcją --help. 
+Jednocześnie polecenie echo jest poleceniem wbudowanym i zewnętrznym ale nie zadziała z opcją --help. Działa wyłącznie jako argument w z poleceniem help.
+Zatem można wywnioskować regułę, że każde polecenie zewnętrzne, które nie jest poleceniem wewnętrznym(wbudowanym) działa z opcją --help, natomiast nigdy nie
+działa jako argument po poleceniu help. Z kolei polecenie wewnętrzne niezależnie czy jest poleceniem wyłącznie wbudowanym lub jednocześnie jest także
+poleceniem zewnętrznym może działać z opcją --help lub nie. Działa natomiast jako argument z poleceniem help.
+Jest jeszcze kwestia aliasów, które są domyślnie zainstalowane w systemie. Takim aliasem jest np. polecenie ls. Wówczas jak wpiszemy type ls to jako 
+lokalizacja polecenia ls zostanie wyświetlona informacja, że polecenie to jest aliasem/ Dlacezgo? Ponieważ polecenie type wyświetla w pierwszej kolejności
+tą lokalizację danego polecenia, w jakiej poszukuje w pierwszej kolejności powłoka, gdy dane polecenie zostanie wydane przez użytkownika. A powłoka
+w pierwszej kolejności wyszukuje poleceń zapisanych jako aliasy.
+Gdzie znajdują się aliasy w systemie? Jeśli chodzi o aliasy domyślne to znajdują się one w katalogu /etc/profile.d/ w pliku colorls.sh
+Jeśli użytkownik stworzy własny alias to jest on zapisywany w katalogu domowym użytkownika w pliku ~/.bashrc
+Z kolei polecenia, które są wyłącznie programami zewnętrznymi znajdują się w katalogu /bin, ściślej w /etc/bin. Pamiętajmy, że katalog /bin to katalog
+/usr/bin oraz że katalog ~/bin to zupełnie inny katalog(ten znajduje się w katalogu domowym użytkownika).
+Polecenia wbudowane, które są wyłącznie poleceniami wewnętrznymi nie znajdują się w żadnym katalogu systemowym. One są wbudowane w pamięć powłoki i działają
+z poziomu wyłacznie powłoki. Jeżeli natomiast dane polecenie jest poleceniem wbudowanym i programem zewnętrzym(plikiem wykonywalnym) to wówczas jako
+polecenie wewnętrzne znajduje się w pamięci powłoki a jako program zewnętrzny znajduje się w katalogu /etc/bin.
+Z kolei polecenie ls jest aliasem i poleceniem zewnętrznym jednocześnie. Wówczas znajduje się ono w pliku colorls.sh w katalogu /etc/profile.d jako alias
+oraz jako program zewnętrzny w katalogu /etc/bin.
+Należy dodać, że dla niektórych poleceń dostępna jest opcja -h. Zwykle działa ona z poleceniami zewnętrznymi ale nie jest to reguła. Ważne aby wiedzieć,
+że opcja -h nie zawsze działa jak opcja --help. Np. polecenie ls, które jest jednocześnie domyślnym aliasem i programem zewnętrznym działa z opcją -h
+jakby jej nie było. 
+Kolejnym poleceniem używanym do wyświetlania informacji o poleceniach powłoki jest polecenie info. Należy wpisać info polecenie aby pobrać informacje 
+o danym poleceniu. Nie jest to polecenie działające dla każdego polecenia Linuxa. Wówczas więcej na temat danego polecenia można odnaleźć w podręczniku
+systemowym man.
+Polecenie man o tej samej nazwie co podręcznik systemowy Linuxa także zwraca informacje na temat danego polecenia. Wystarczy wpisać man polecenie.
+Polecenie to działa dla tych wszystkich poleceń systemu Linux dla których istnieją strony w podręczniku man dla tych poleceń. Np. gdy wpiszemy 
+man while, to wówczas wyświetli się komunikat " Brak podręcznika systemowego dla polecenia while".
+Warto wspomnieć, że każda ze stron podręcznika man na temat danego polecenia systemu Linux należy do każdej z różnych ośmiu sekcji.
+Sekcje stron podręcznika systemowego man:
+1.Polecenia użytkownika
+2.Wywołania systemowe
+3.Funkcje biblioteki C
+4.Urządzenia i pliki specjalne
+5.Formaty plików i konwencje
+6.Gry
+7.Różne
+8.Administracja systemem
+
+Polecenia man można używać z różnymi opcjami. Jedną z nich jest opcja -k. Opcja ta umożliwia wyświetlenie dokumentacji danego polecenia.
+Informacje, które zostaną wyświetlone po komendzie man -k polecenie dotyczą dokumentacji danego polecenia wraz z numerami sekcji stron podręcznika
+systemowego man. Nie zawsze jednak będą to sekcje dotyczące wyłącznie polecenia, którego dokumenctacji szukamy. Gdy już wydamy komendę man -k polecenie
+wówczas warto szukać tylko tych wyświetleń, które zawierają samą nazwę polecenia, nie połączoną z innymi poleceniami.
+Np. gdy wpiszemy man -k passwd to jako pierwsza pozycja na liście zostanie wyświetlona nazwa chgpasswd(8), gdzie cyfra 8 oznacza numer sekcji 8
+podręcznika systemowego. Warto jeszcze dodać, że gdy chcemy poznać dokumentację danego polecenia z danej sekcji to można użyć komendy man 5 passwd.
+Wówczas zobaczymy dokumentację polecenia passwd z sekcji numer 5 podręcznika man. Ale gdy wpiszemy man 8 passwd wówczas otrzymamy komunikat:
+"Brak podręcznika dla passwd w sekcji 8. Dlaczego? Ponieważ musimy szukać tylko tych linijek w dokumentacji, które zawierają samą nazwę polecenia
+na temat którego dokumentacji szukamy. Chodzi o to, że polecenie man z opcją -k wyszukuje wszystkie strony gdzie pojawia się nazwa danego polecenia,
+traktując nazwę danego polecenie jak słowo kluczowe. Ponieważ polecenie passwd nie jest poleceniem administracyjnym to nie ma strony dokumentacji
+tego polecenia w sekcji 8. Ale w sekcji 8 znajduje się moduł, którego nazwa zawiera słowo passwd.
